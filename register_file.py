@@ -70,7 +70,7 @@ class RegisterFile:
         # `IndexError` with message "Register index out of bounds!" This
         # method needn't have an explicit return. Replace `pass` below.
         if not isinstance(idx, int) or idx < 0 or idx >= self.NUM_REGISTERS:
-            raise IndexError("Register index out of bounds")
+            raise IndexError("Register index out of bounds!")
 
     def _read(self, ra, rb):
         """
