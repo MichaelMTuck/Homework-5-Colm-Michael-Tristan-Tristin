@@ -58,8 +58,16 @@ class Memory:
         # Otherwise, call `_check_addr()`. If OK, write masked value to the
         # selected address, then turn off `_write_enable` when done. Return
         # `True` on success. Replace `pass` below.
-        pass
-        return True
+        if self._write_enable():
+            self._check_addr()
+
+            maskedValue = value & 65,536
+            self._cells.update({addr, maskedValue})
+
+            self.write_enable()
+            return True
+        else:
+            raise RuntimeError
 
     def hexdump(self, start=0, stop=None, width=8):
         """
