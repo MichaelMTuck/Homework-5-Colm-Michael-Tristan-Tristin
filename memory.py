@@ -27,13 +27,17 @@ class Memory:
     def _check_addr(self, address):
         # Make sure address is positive, in the desired range,
         # otherwise raise a `ValueError`. Replace `pass` below.
-        pass
+        if (address < 0) or (address > (len(self._cells)-1)):
+            raise ValueError
 
     def write_enable(self, b):
         # Make sure `b` is a Boolean (hint: use `isinstance()).
         # If not, raise `TypeError`. If OK, then set
         # `_write_enable` accordingly. Replace `pass` below.
-        pass
+        if not isinstance(b, bool):
+            raise TypeError
+        else:
+            self._write_enable != self._write_enable
 
     def read(self, addr):
         """
@@ -42,7 +46,9 @@ class Memory:
         # Make sure `addr` is OK by calling `_check_addr`. If OK, return value
         # from `_cells` or default if never written. (Hint: use `.get()`.)
         # Replace `pass` below.
-        pass
+        self._check_addr(addr)
+        o = self._cells.get(addr)
+        return o
 
     def write(self, addr, value):
         """
