@@ -139,7 +139,14 @@ class InstructionMemory(Memory):
         # `super().write(start_addr + offset, word)` as needed. Important:
         # Ensure that `_loading` and `_write_enable` are set to `False` when
         # done. (Hint: use `try`/`finally`.) Replace `pass` below.
-        pass
+        offloading_words = words
+        self._write_enable = True;
+        while offloading_words > 0:
+            super().write(start_addr + offset, word)
+            del offloading_words[start_addr + offset]
+            offset += 1
+        self._write_enable = False
+        self._loading = False
 
 
 if __name__ == "__main__":
