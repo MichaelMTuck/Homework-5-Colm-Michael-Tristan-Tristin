@@ -27,8 +27,8 @@ class Memory:
     def _check_addr(self, address):
         # Make sure address is positive, in the desired range,
         # otherwise raise a `ValueError`. Replace `pass` below.
-        if (address < 0) or (address > (len(self._cells)-1)):
-            raise ValueError
+        if (address < 0) or (address > 65536):
+            raise ValueError("check_addr issue")
 
     def write_enable(self, b):
         # Make sure `b` is a Boolean (hint: use `isinstance()).
@@ -37,7 +37,7 @@ class Memory:
         if not isinstance(b, bool):
             raise TypeError
         else:
-            self._write_enable != self._write_enable
+            self._write_enable = b
 
     def read(self, addr):
         """
@@ -47,8 +47,12 @@ class Memory:
         # from `_cells` or default if never written. (Hint: use `.get()`.)
         # Replace `pass` below.
         self._check_addr(addr)
-        o = self._cells.get(addr)
-        return o
+
+        if self._cells.get(addr) is None:
+            return self.default
+        else:
+            o = self._cells.get(addr)
+            return o
 
     def write(self, addr, value):
         """
@@ -58,13 +62,15 @@ class Memory:
         # Otherwise, call `_check_addr()`. If OK, write masked value to the
         # selected address, then turn off `_write_enable` when done. Return
         # `True` on success. Replace `pass` below.
-        if self._write_enable():
-            self._check_addr()
+        if self._write_enable:
+            if(value > 65536):
+                raise ValueError
+            self._check_addr(addr)
 
-            maskedValue = value & 65,536
-            self._cells.update({addr, maskedValue})
+            maskedValue = value & 65536
+            self._cells.update(addr=maskedValue)
 
-            self.write_enable()
+            self._write_enable = False;
             return True
         else:
             raise RuntimeError
