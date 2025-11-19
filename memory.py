@@ -27,17 +27,20 @@ class Memory:
     def _check_addr(self, address):
         # Make sure address is positive, in the desired range,
         # otherwise raise a `ValueError`. Replace `pass` below.
-        if (address < 0) or (address > 65536):
-            raise ValueError("check_addr issue")
+        # Correct range check, 0x0000–0xFFFF inclusive -TH
+        if not isinstance(address, int):
+            raise ValueError("Address must be int")
+        if address < 0 or address > 0xFFFF:
+            raise ValueError(f"Address out of range: {address:#06x}") #
 
     def write_enable(self, b):
         # Make sure `b` is a Boolean (hint: use `isinstance()).
         # If not, raise `TypeError`. If OK, then set
         # `_write_enable` accordingly. Replace `pass` below.
+        # Boolean check using isinstance -TH
         if not isinstance(b, bool):
-            raise TypeError
-        else:
-            self._write_enable = b
+            raise TypeError("write_enable expects a boolean") # -TH
+        self._write_enable = b
 
     def read(self, addr):
         """
@@ -46,13 +49,9 @@ class Memory:
         # Make sure `addr` is OK by calling `_check_addr`. If OK, return value
         # from `_cells` or default if never written. (Hint: use `.get()`.)
         # Replace `pass` below.
+        # Check addr and return default using .get -TH
         self._check_addr(addr)
-
-        if self._cells.get(addr) is None:
-            return self.default
-        else:
-            o = self._cells.get(addr)
-            return o
+        return self._cells.get(addr, self.default)
 
     def write(self, addr, value):
         """
@@ -62,18 +61,18 @@ class Memory:
         # Otherwise, call `_check_addr()`. If OK, write masked value to the
         # selected address, then turn off `_write_enable` when done. Return
         # `True` on success. Replace `pass` below.
-        if self._write_enable:
-            if(value > 65536):
-                raise ValueError
-            self._check_addr(addr)
+        # Proper write-enable handling -TH
+        if not self._write_enable:
+            raise RuntimeError("Write attempted without write_enable=True") # -TH
 
-            maskedValue = value & 65536
-            self._cells.update(addr=maskedValue)
+        self._check_addr(addr)
 
-            self._write_enable = False;
-            return True
-        else:
-            raise RuntimeError
+        # Masking value to 16 bits (0xFFFF), not incorrect 65536 -TH
+        masked = value & 0xFFFF
+        self._cells[addr] = masked # store correctly
+
+        self._write_enable = False # auto-clear
+        return True
 
     def hexdump(self, start=0, stop=None, width=8):
         """
@@ -139,20 +138,20 @@ class InstructionMemory(Memory):
         """
         Load list of 16-bit words into consecutive memory cells.
         """
-        self._loading = True
         # Write each word in `words` to successive addresses in instruction
         # memory. Set `_write_enable` as needed can call parent write with
         # `super().write(start_addr + offset, word)` as needed. Important:
         # Ensure that `_loading` and `_write_enable` are set to `False` when
         # done. (Hint: use `try`/`finally`.) Replace `pass` below.
-        offloading_words = words
-        self._write_enable = True;
-        while offloading_words > 0:
-            super().write(start_addr + offset, word)
-            del offloading_words[start_addr + offset]
-            offset += 1
-        self._write_enable = False
-        self._loading = False
+        # Correct loading loop + write_enable handling + try/finally -TH
+        self._loading = True
+        try:
+            for offset, word in enumerate(words):
+                self._write_enable = True # must be set before each write
+                super().write(start_addr + offset, word)
+        finally:
+            self._write_enable = False # ensure disabled after load
+            self._loading = False
 
 
 if __name__ == "__main__":
