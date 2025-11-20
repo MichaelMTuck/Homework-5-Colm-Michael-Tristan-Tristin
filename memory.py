@@ -39,7 +39,7 @@ class Memory:
         # `_write_enable` accordingly. Replace `pass` below.
         # Boolean check using isinstance -TH
         if not isinstance(b, bool):
-            raise TypeError("write_enable expects a boolean") # -TH
+            raise TypeError("write_enable expects a boolean") 
         self._write_enable = b
 
     def read(self, addr):
@@ -63,7 +63,7 @@ class Memory:
         # `True` on success. Replace `pass` below.
         # Proper write-enable handling -TH
         if not self._write_enable:
-            raise RuntimeError("Write attempted without write_enable=True") # -TH
+            raise RuntimeError("Write attempted without write_enable=True") 
 
         self._check_addr(addr)
 
